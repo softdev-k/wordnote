@@ -2,6 +2,33 @@
 
 This repository contains a local learning application built with Node.js, Express, Prisma, and SQLite. The root menu at `home_t.html` lets you choose between the Wordbook and Wordnote apps.
 
+## Features
+
+### Wordbook
+
+`wordbook/` is the flashcard app for managing folders, cards, review schedules, and CSV import/export.
+
+- **Folder management** - Create, rename, delete, and browse folders, with card counts shown for each folder.
+- **Card management** - Add, edit, delete, and review cards inside the selected folder.
+- **Card flip view** - Click a card to switch between front and back.
+- **Study modal** - Open cards in a larger modal, move between cards, and switch between front and back manually.
+- **Review scheduling** - Pick a date from the calendar and automatically create review dates for 1, 3, 7, 14, and 30 days later.
+- **Today’s review list** - Show the folders that are due for review today.
+- **CSV export** - Download the cards in a folder as CSV.
+- **CSV import** - Import folders and cards from a CSV file.
+
+### Wordnote
+
+`wordnote/` is the vocabulary-book app for managing books, study modes, learning progress, and the 初級 workflow.
+
+- **Book management** - Create, rename, delete, and list word books.
+- **Book settings** - Store per-book settings such as maximum size, review settings, difficulty, and progress thresholds.
+- **Study modes** - Study cards by today’s due cards, difficulty level, random selection, or custom filters.
+- **Common study UI** - Use audio playback, answer buttons, next-card navigation, and study history saving.
+- **Initial-level workflow** - Open the 初級 screens for word display, word input, and incremental information entry.
+- **Progress tracking** - Track fields such as difficulty, current level, info-plus progress, review date, and study history.
+- **CSV import/export** - Export or import word-book data as CSV.
+
 ## Architecture
 
 ```mermaid
