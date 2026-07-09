@@ -19,8 +19,7 @@
 **技術スタック:**
 - **バックエンド:** Node.js + Express.js
 - **データベース:** SQLite + Prisma ORM
-- **フロントエンド:** HTML5 + Vanilla JavaScript + CSS3
-- **実行環境:** Windows PowerShell 5.1+
+- **フロントエンド:** HTML5 + JavaScript + CSS3
 
 **主な特徴:**
 - マルチフォルダ対応（複数の学習セットを管理）
