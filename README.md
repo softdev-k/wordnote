@@ -1,6 +1,6 @@
-# 単語帳（wordbook）- システム仕様書
+# 単語帳 / 単語ノート - システム仕様書
 
-シンプルなフラッシュカード学習アプリケーション。複数フォルダの管理、スペーシング学習スケジュール、CSV入出力機能を備えています。
+Node.js + Express + Prisma で動作するローカル向け学習アプリケーションです。ルートのメニュー画面から「単語帳」と「単語ノート」の 2 系統に分かれ、各画面は HTML / JavaScript / CSS だけで構成されています。
 
 ## 目次
 1. [システム概要](#システム概要)
@@ -20,6 +20,7 @@
 - **バックエンド:** Node.js + Express.js
 - **データベース:** SQLite + Prisma ORM
 - **フロントエンド:** HTML5 + JavaScript + CSS3
+- **起動ページ:** `home_t.html`（アプリ選択メニュー）
 
 **主な特徴:**
 - マルチフォルダ対応（複数の学習セットを管理）
@@ -71,22 +72,28 @@
 │                     ブラウザ（クライアント）                    │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│  home.html           folders.html          index.html      │
-│     ↓                    ↓                     ↓            │
-│  [Menu]          [Folder List]        [Card Management]    │
-│                                                              │
-│  review.html         check.html       folders-check.html   │
-│     ↓                    ↓                    ↓             │
-│  [Today's]         [Card Learn]       [Schedule & CSV]     │
-│  [Review]                                                   │
+│  home_t.html                                              │
+│     ↓                                                     │
+│  [アプリ選択メニュー]                                        │
+│     ├─ wordbook/home.html                                 │
+│     │    ├─ folders.html                                  │
+│     │    ├─ folders-check.html                            │
+│     │    ├─ check.html                                    │
+│     │    └─ review.html                                   │
+│     └─ wordnote/index.html                                │
+│          ├─ study/                                        │
+│          └─ 初級/                                         │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │           JavaScript Modules (static/)              │   │
-│  │ ┌────────────────────────────────────────────────┐  │   │
-│  │ │ app.js, folders.js, check.js, review.js      │  │   │
-│  │ │ folders-check.js, csv-export.js, csv-import.js│  │   │
-│  │ │ style.css                                      │  │   │
-│  │ └────────────────────────────────────────────────┘  │   │
+│  │  wordbook/static/                                   │   │
+│  │   app.js, folders.js, check.js, review.js           │   │
+│  │   folders-check.js, csv-export.js, csv-import.js    │   │
+│  │   style.css                                          │   │
+│  │                                                      │   │
+│  │  wordnote/                                           │   │
+│  │   index.js, import.js, export.js                    │   │
+│  │   study/*.js, 初級/*.js                              │   │
+│  │   index.css, study/study.css, 初級/*.css            │   │
 │  └──────────────────────────────────────────────────────┘   │
 │                                                              │
 │             localStorage: current_folder_id                │
@@ -127,6 +134,8 @@
 │  - Folder                                                   │
 │  - Card                                                     │
 │  - ReviewSchedule                                           │
+│  - WordnoteBook                                             │
+│  - WordnoteCard                                             │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -377,19 +386,28 @@ Cascade Delete: Yes
 
 ## ページ構成
 
-### home.html
-**目的:** メニューページ  
-**URL:** http://localhost:3000/home.html
+### home_t.html
+**目的:** アプリ選択メニュー  
+**URL:** http://localhost:3000/
 
-- 「フォルダ」ボタン → folders.html へ遷移
+- 「単語帳」ボタン → wordbook/home.html へ遷移
+- 「単語ノート」ボタン → wordnote/index.html へ遷移
+
+---
+
+### wordbook/home.html
+**目的:** 単語帳メニュー  
+**URL:** http://localhost:3000/wordbook/home.html
+
+- 「作成」ボタン → folders.html へ遷移
+- 「確認」ボタン → folders-check.html へ遷移
 - 「復習」ボタン → review.html へ遷移
-- 「学習」ボタン → folders-check.html へ遷移
 
 ---
 
 ### folders.html
 **目的:** フォルダ一覧・管理  
-**URL:** http://localhost:3000/folders.html
+**URL:** http://localhost:3000/wordbook/folders.html
 
 **UI要素:**
 - フォルダ一覧（グリッド表示）
@@ -403,7 +421,7 @@ Cascade Delete: Yes
 
 ### index.html
 **目的:** 選択フォルダのカード学習  
-**URL:** http://localhost:3000/index.html
+**URL:** http://localhost:3000/wordbook/index.html
 
 **UI要素:**
 - ヘッダー: フォルダ名 + カード件数
@@ -421,7 +439,7 @@ Cascade Delete: Yes
 
 ### check.html
 **目的:** フォルダのカード確認・学習  
-**URL:** http://localhost:3000/check.html
+**URL:** http://localhost:3000/wordbook/check.html
 
 **UI要素:**
 - ヘッダー: フォルダ名 + カード件数 + 学習ボタン（from review のみ）
@@ -435,7 +453,7 @@ Cascade Delete: Yes
 
 ### folders-check.html
 **目的:** 復習スケジュール設定 + CSV 入出力  
-**URL:** http://localhost:3000/folders-check.html
+**URL:** http://localhost:3000/wordbook/folders-check.html
 
 **UI要素:**
 - フォルダ一覧
@@ -453,7 +471,7 @@ Cascade Delete: Yes
 
 ### review.html
 **目的:** 本日の復習フォルダ表示  
-**URL:** http://localhost:3000/review.html
+**URL:** http://localhost:3000/wordbook/review.html
 
 **UI要素:**
 - 本日の復習予定フォルダ一覧
@@ -465,21 +483,76 @@ Cascade Delete: Yes
 
 ---
 
+### wordnote/index.html
+**目的:** 単語本一覧・学習メニュー  
+**URL:** http://localhost:3000/wordnote/index.html
+
+**UI要素:**
+- 単語本一覧
+- 単語本の作成・名前変更・削除
+- 今日の学習への遷移
+- 設定ダイアログ
+
+**スクリプト依存:**
+- `wordnote/index.js`
+- `wordnote/import.js`
+- `wordnote/export.js`
+
+---
+
+### wordnote/study/study.html
+**目的:** 単語本の学習画面  
+**URL:** http://localhost:3000/wordnote/study/study.html
+
+**UI要素:**
+- 学習モード切り替え
+- カード表示・回答操作
+- 学習完了時の遷移
+
+**スクリプト依存:**
+- `wordnote/study/study.js`
+- `wordnote/study/study-core.js`
+- `wordnote/study/study-basic.js`
+- `wordnote/study/study-intermediate.js`
+- `wordnote/study/study-advanced.js`
+- `wordnote/study/study-custom.js`
+- `wordnote/study/study-random.js`
+- `wordnote/study/study-today.js`
+- `wordnote/study/study-completion.js`
+
+---
+
+### wordnote/初級/
+**目的:** 初級カードの表示・入力・情報追加  
+
+- `display.html` - 単語カードの表示画面
+- `input.html` - 単語入力画面
+- `info_plus/info_plus.html` - 情報追加画面
+
+**スクリプト依存:**
+- `wordnote/初級/display.js`
+- `wordnote/初級/input.js`
+- `wordnote/初級/select.js`
+- `wordnote/初級/info_plus/info_plus.js`
+
+---
+
 ## セットアップ手順
 
 ### 前提条件
-- Node.js 16+
+- Node.js 18.18+
 - npm
 - Windows PowerShell 5.1+（推奨）
 
 ### インストール
 
-1. **リポジトリをクローン（または ZIP を解凍）**
+1. **リポジトリのルートへ移動**
 
 ```powershell
-# すでにディレクトリ内の場合はスキップ
-cd wordbook
+cd wordnote
 ```
+
+この README が置かれているディレクトリがプロジェクトルートなら、この手順は不要です。
 
 2. **依存関係をインストール**
 
@@ -495,7 +568,8 @@ npx prisma db push
 ```
 
 > **注:** `prisma/dev.db` が既に存在する場合、スキーマが適用されます。  
-> リセットする場合は `rm prisma/dev.db` 後に再実行してください。
+> `npx prisma db push` を実行すると、SQLite データベース `prisma/dev.db` が作成されます。  
+> リセットする場合は `Remove-Item prisma/dev.db` の後に再実行してください。
 
 4. **サーバー起動**
 
@@ -505,13 +579,13 @@ npm start
 
 > **出力例:**
 > ```
-> Server running at http://localhost:3000
+> Server listening on http://localhost:3000
 > ```
 
 5. **ブラウザで開く**
 
 ```
-http://localhost:3000/home.html
+http://localhost:3000/
 ```
 
 ### トラブルシューティング
@@ -541,28 +615,61 @@ npm start
 ### ファイル構成
 
 ```
-wordbook/
+wordnote/
+├── home_t.html            # アプリ選択メニュー
 ├── server.js              # Express サーバー（API実装）
-├── home.html              # メニュー画面
-├── index.html             # カード学習
-├── check.html             # カード確認・学習モーダル
-├── folders.html           # フォルダ管理
-├── folders-check.html     # スケジュール・CSV
-├── review.html            # 復習管理
 ├── package.json
+├── package-lock.json
 ├── prisma/
 │   ├── schema.prisma      # DB スキーマ
-│   └── dev.db             # SQLite データベース
-├── static/
-│   ├── style.css          # グローバルスタイル
-│   ├── app.js             # index.html の JS
-│   ├── check.js           # check.html の JS
-│   ├── folders.js         # folders.html の JS
-│   ├── folders-check.js   # folders-check.html の JS
-│   ├── review.js          # review.html の JS
-│   ├── csv-export.js      # CSV 出力機能
-│   └── csv-import.js      # CSV 入力機能
-├── .gitignore
+│   └── migrations/        # マイグレーション履歴
+├── data/
+│   └── cards.json         # 移行・参照用データ
+├── wordbook/
+│   ├── home.html          # 単語帳メニュー
+│   ├── index.html         # フォルダ別のカード学習
+│   ├── check.html         # カード確認・学習モーダル
+│   ├── folders.html       # フォルダ管理
+│   ├── folders-check.html # スケジュール・CSV
+│   ├── review.html        # 復習管理
+│   └── static/
+│       ├── app.js
+│       ├── check.js
+│       ├── csv-export.js
+│       ├── csv-import.js
+│       ├── folders-check.js
+│       ├── folders.js
+│       ├── review.js
+│       └── style.css
+├── wordnote/
+│   ├── index.html         # 単語本一覧・学習メニュー
+│   ├── index.js
+│   ├── import.js
+│   ├── export.js
+│   ├── study/
+│   │   ├── study.html
+│   │   ├── study.js
+│   │   ├── study.css
+│   │   ├── study-core.js
+│   │   ├── study-basic.js
+│   │   ├── study-intermediate.js
+│   │   ├── study-advanced.js
+│   │   ├── study-custom.js
+│   │   ├── study-random.js
+│   │   ├── study-today.js
+│   │   └── study-completion.js
+│   └── 初級/
+│       ├── display.html
+│       ├── display.js
+│       ├── input.html
+│       ├── input.js
+│       ├── select.css
+│       ├── select.js
+│       ├── style.css
+│       └── info_plus/
+│           ├── info_plus.html
+│           ├── info_plus.js
+│           └── info_plus.css
 └── README.md              # このファイル
 ```
 
@@ -588,7 +695,7 @@ npx prisma migrate dev --name <migration_name>
 **DB リセット（開発用）:**
 
 ```powershell
-rm prisma/dev.db
+Remove-Item prisma/dev.db
 npx prisma db push
 ```
 
