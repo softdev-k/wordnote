@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語帳 - 英単語帳アプリ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="select.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>単語帳（初級）</h1>
+            <div style="margin-top:10px;"><a class="btn btn-back" href="../index.html">← トップへ戻る</a></div>
+        </div>
+
+        <!-- 見開きノート -->
+        <div class="notebook">
+            <div class="notebook-inner">
+                <!-- 左ページ -->
+                <div class="page page-left">
+                    <div id="leftPage" class="page-content">
+                        <!-- 単語カード1つ目 -->
+                    </div>
+                </div>
+                
+                <!-- 右ページ -->
+                <div class="page page-right">
+                    <div id="rightPage" class="page-content">
+                        <!-- 単語カード2つ目 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ページネーション -->
+        <div class="pagination">            <button id="goToPageZeroBtn" class="btn btn-nav">« 0ページ</button>            <button id="prevBtn" class="btn btn-nav">← 前へ</button>
+            <span id="pageInfo" class="page-info">1 / 1</span>
+            <button id="nextBtn" class="btn btn-nav">次へ →</button>
+        </div>
+    </div>
+
+    <!-- 情報追加モーダル -->
+    <div id="infoPlusModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>情報を追加</h2>
+                <button class="modal-close-btn">&times;</button>
+            </div>
+
+            <!-- ステップ1: 単語選択 -->
+            <div id="step1-word-select" class="modal-step">
+                <h3>ステップ1: 単語を選択</h3>
+                <p class="step-description">直近の学習評価が4の単語のみ選択できます</p>
+                <div class="difficulty-filter" style="margin-bottom: 15px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                    <span style="font-weight: 600; margin-right: 5px; align-self: center;">難易度:</span>
+                    <button class="difficulty-btn" data-difficulty="1">初級</button>
+                    <button class="difficulty-btn" data-difficulty="2">中級</button>
+                    <button class="difficulty-btn" data-difficulty="3">上級</button>
+                    <button class="difficulty-btn" data-difficulty="4">完成</button>
+                    <button class="difficulty-btn active" data-difficulty="all">全て</button>
+                </div>
+                <div id="wordList" class="word-list"></div>
+            </div>
+
+            <!-- ステップ2: 情報種類選択 -->
+            <div id="step2-info-select" class="modal-step hidden">
+                <h3>ステップ2: 追加する情報を選択</h3>
+                <p class="step-description" id="selectedWordLabel"></p>
+                <div class="info-type-buttons">
+                    <button class="info-type-btn" data-type="sub-meaning" data-index="0">
+                        <span class="btn-number">①</span>
+                        <span class="btn-text">サブの意味＋対義語</span>
+                        <span class="btn-status">未完了</span>
+                    </button>
+                    <button class="info-type-btn" data-type="derivative" data-index="1" disabled>
+                        <span class="btn-number">②</span>
+                        <span class="btn-text">派生語</span>
+                        <span class="btn-status">未完了</span>
+                    </button>
+                    <button class="info-type-btn" data-type="synonym" data-index="2" disabled>
+                        <span class="btn-number">③</span>
+                        <span class="btn-text">類義語</span>
+                        <span class="btn-status">未完了</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ステップ3: 情報入力 -->
+            <div id="step3-info-input" class="modal-step hidden">
+                <h3 id="inputTitle">情報入力</h3>
+                <div id="inputForm"></div>
+                <div class="form-buttons">
+                    <button id="completeBtn" class="btn btn-primary">完了して次へ</button>
+                    <button id="backBtn" class="btn btn-secondary">戻る</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 削除モーダル（UI改良版） -->
+    <div id="deleteModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width: 420px; max-height: 90vh; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; background: #f5f5f7; padding: 1.2rem 1.5rem 1rem 1.5rem; border-bottom: 1px solid #e0e0e0;">
+                <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600; letter-spacing: 0.02em; color: #222;">単語を削除</h2>
+                <button class="modal-close-btn" id="closeDeleteModal" style="font-size: 1.5rem; background: none; border: none; color: #888; cursor: pointer; transition: color 0.2s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 1.5rem 0.5rem 1.5rem; background: #fff; overflow-y: auto; flex: 1 1 auto; min-height: 0;">
+                <p class="step-description" style="margin-bottom: 1.2rem; color: #444; font-size: 1rem;">削除したい単語を選択してください。</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button id="selectAllBtn" class="btn btn-secondary" style="flex: 1;">全選択</button>
+                    <button id="deselectAllBtn" class="btn btn-secondary" style="flex: 1;">全解除</button>
+                </div>
+                <div id="deleteWordList" class="word-list" style="max-height: 320px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafbfc; padding: 0.5rem;"></div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 0.75rem; justify-content: flex-end; background: #f5f5f7; padding: 1rem 1.5rem; border-top: 1px solid #e0e0e0; position: sticky; bottom: 0; z-index: 2;">
+                <button id="cancelDeleteBtn" class="btn btn-secondary" style="min-width: 90px;">キャンセル</button>
+                <button id="executeDeleteBtn" class="btn btn-primary" style="background-color: #f44336; min-width: 110px; font-weight: 600;">削除実行</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 変更モーダル -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width: 420px; max-height: 90vh; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; background: #f5f5f7; padding: 1.2rem 1.5rem 1rem 1.5rem; border-bottom: 1px solid #e0e0e0;">
+                <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600; letter-spacing: 0.02em; color: #222;">単語を変更</h2>
+                <button class="modal-close-btn" id="closeEditModal" style="font-size: 1.5rem; background: none; border: none; color: #888; cursor: pointer; transition: color 0.2s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 1.5rem 0.5rem 1.5rem; background: #fff; overflow-y: auto; flex: 1 1 auto; min-height: 0;">
+                <p class="step-description" style="margin-bottom: 1.2rem; color: #444; font-size: 1rem;">変更したい単語を1つ選択してください。</p>
+                <div id="editWordList" class="word-list" style="max-height: 320px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafbfc; padding: 0.5rem;"></div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 0.75rem; justify-content: flex-end; background: #f5f5f7; padding: 1rem 1.5rem; border-top: 1px solid #e0e0e0; position: sticky; bottom: 0; z-index: 2;">
+                <button id="cancelEditBtn" class="btn btn-secondary" style="min-width: 90px;">キャンセル</button>
+                <button id="executeEditBtn" class="btn btn-primary" style="background-color: #4CAF50; min-width: 110px; font-weight: 600;">次へ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="display.js"></script>
+    <script src="select.js"></script>
+</body>
+</html>

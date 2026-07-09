@@ -1,0 +1,17 @@
+-- RedefineTables
+PRAGMA defer_foreign_keys=ON;
+PRAGMA foreign_keys=OFF;
+CREATE TABLE "new_WordnoteBook" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "level" TEXT NOT NULL,
+    "maxSize" INTEGER NOT NULL DEFAULT 50,
+    "reviewBase" REAL NOT NULL DEFAULT 0.5,
+    "reviewGrowth" REAL NOT NULL DEFAULT 2.0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO "new_WordnoteBook" ("createdAt", "id", "level", "name", "reviewBase", "reviewGrowth") SELECT "createdAt", "id", "level", "name", "reviewBase", "reviewGrowth" FROM "WordnoteBook";
+DROP TABLE "WordnoteBook";
+ALTER TABLE "new_WordnoteBook" RENAME TO "WordnoteBook";
+PRAGMA foreign_keys=ON;
+PRAGMA defer_foreign_keys=OFF;

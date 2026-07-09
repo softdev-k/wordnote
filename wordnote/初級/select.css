@@ -1,0 +1,363 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+}
+
+/* モーダル全体 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    position: relative;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1001;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f5f5f5;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    line-height: 1;
+}
+
+.modal-close-btn:hover {
+    color: #000;
+}
+
+/* ステップ */
+.modal-step {
+    padding: 20px;
+}
+
+.modal-step.hidden {
+    display: none;
+}
+
+.modal-step h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.step-description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* ステップ1: 単語一覧 */
+.word-list {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.word-line {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: space-between;
+}
+
+.word-line:hover:not(.disabled) {
+    background-color: #f9f9f9;
+}
+
+.word-line.active {
+    background-color: #e3f2fd;
+    border-left: 4px solid #1976d2;
+}
+
+.word-line.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+}
+
+.word-text {
+    font-weight: bold;
+    color: #333;
+    flex: 1;
+}
+
+.word-meaning {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ステップ2: 情報種類選択 */
+.info-type-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-type-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    text-align: left;
+}
+
+.info-type-btn:hover:not(:disabled) {
+    border-color: #1976d2;
+    background-color: #f0f7ff;
+}
+
+.info-type-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+}
+
+.info-type-btn.completed {
+    border-color: #4caf50;
+    background-color: #f1f8f4;
+}
+
+.btn-number {
+    font-weight: bold;
+    color: #1976d2;
+    font-size: 18px;
+    min-width: 25px;
+}
+
+.btn-text {
+    flex: 1;
+}
+
+.btn-status {
+    font-size: 12px;
+    color: #999;
+    padding: 4px 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.info-type-btn.completed .btn-status {
+    background-color: #4caf50;
+    color: white;
+}
+
+/* ステップ3: 情報入力 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 5px rgba(25, 118, 210, 0.3);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #1976d2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1565c0;
+}
+
+.btn-primary:active {
+    background-color: #0d47a1;
+}
+
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* レスポンシブ */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .info-type-btn {
+        flex-wrap: wrap;
+    }
+}
+
+/* 難易度フィルタ */
+.difficulty-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.difficulty-filter label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.difficulty-btn {
+    padding: 6px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 45px;
+}
+
+.difficulty-btn:hover {
+    border-color: #999;
+    background: #f5f5f5;
+}
+
+.difficulty-btn.active {
+    background: #1976d2;
+    color: white;
+    border-color: #1976d2;
+}
+
+.difficulty-btn[data-difficulty="1"].active {
+    background: #4caf50;
+    border-color: #4caf50;
+}
+
+.difficulty-btn[data-difficulty="2"].active {
+    background: #ff9800;
+    border-color: #ff9800;
+}
+
+.difficulty-btn[data-difficulty="3"].active {
+    background: #e91e63;
+    border-color: #e91e63;
+}
+
+.difficulty-btn[data-difficulty="4"].active {
+    background: #f44336;
+    border-color: #f44336;
+}
+/* チェックボックスのスタイル */
+.meaning-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #4caf50;
+    cursor: default !important;
+}
+
+.meaning-checkbox:checked {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}

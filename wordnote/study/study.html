@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習カード</title>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="study.css">
+</head>
+<body>
+  <div class="study-container">
+    <div class="study-header">
+      <h1 id="studyTitle">学習カード</h1>
+      <div class="study-info" id="studyInfo">読み込み中...</div>
+    </div>
+
+    <div class="progress" id="progress">0 / 0</div>
+
+    <div class="study-main-layout">
+      <div id="cardContent" class="card-content">
+        <!-- カードはJavaScriptで動的に挿入 -->
+      </div>
+
+      <div class="study-controls-sidebar">
+        <div id="questionSection" class="question-section">
+          <div class="question-text">
+            <p id="questionPrompt"></p>
+          </div>
+          <div class="question-buttons">
+            <button class="question-btn" id="questionBtn"></button>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <div class="back-link">
+      <a href="../index.html">← 単語本一覧に戻る</a>
+    </div>
+  </div>
+
+  <!-- Study module scripts -->
+  <script src="study-core.js"></script>
+  <script src="study-basic.js"></script>
+  <script src="study-intermediate.js"></script>
+  <script src="study-advanced.js"></script>
+  <script src="study-completion.js"></script>
+  <script src="study-random.js"></script>
+  <script src="study-custom.js"></script>
+  <script src="study-today.js"></script>
+  <script src="study.js"></script>
+</body>
+</html>

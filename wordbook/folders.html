@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>単語帳 - フォルダ</title>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <header class="top-header">
+      <a class="back-link" href="#" id="backLink">← 戻る</a>
+      <h1>フォルダ</h1>
+    </header>
+
+    <div class="folder-controls">
+      <div class="folder-controls-left">
+        <button class="control-btn create-btn" id="btnCreateFolder">作成</button>
+        <button class="control-btn delete-btn" id="btnDeleteFolder">削除</button>
+        <button class="control-btn" id="btnEditFolder">名前変更</button>
+      </div>
+      <div id="folderCount" class="count-display">...</div>
+    </div>
+
+    <div class="folder-list" id="folderList">
+      <!-- フォルダは JavaScript で動的に追加されます -->
+    </div>
+  </div>
+
+  <!-- フォルダ作成モーダル -->
+  <div id="createFolderModal" class="modal">
+    <div class="modal-content">
+      <h2>新しいフォルダを作成</h2>
+      <input type="text" id="folderNameInput" class="folder-input" placeholder="フォルダ名を入力" />
+      <div class="modal-buttons">
+        <button id="confirmCreateFolder" class="modal-btn confirm-btn">作成する</button>
+        <button id="cancelCreateFolder" class="modal-btn cancel-btn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- フォルダ削除モーダル -->
+  <div id="deleteFolderModal" class="modal">
+    <div class="modal-content">
+      <h2>フォルダを削除</h2>
+      <p id="deleteFolderMessage" style="white-space: pre-line;"></p>
+      <div class="modal-buttons">
+        <button id="confirmDeleteFolder" class="modal-btn confirm-btn">削除する</button>
+        <button id="cancelDeleteFolder" class="modal-btn cancel-btn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- フォルダ名変更モーダル -->
+  <div id="editFolderModal" class="modal">
+    <div class="modal-content edit-modal-content">
+      <h2>フォルダ名を変更</h2>
+      <input type="text" id="editFolderNameInput" class="folder-input" placeholder="新しいフォルダ名を入力" />
+      <div class="modal-buttons">
+        <button id="confirmEditFolder" class="modal-btn confirm-btn">変更する</button>
+        <button id="cancelEditFolder" class="modal-btn cancel-btn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/folders.js"></script>
+
+</body>
+
+</html>

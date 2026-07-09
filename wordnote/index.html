@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>単語ノート</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="初級/select.css">
+</head>
+<body>
+  <h1>単語ノート</h1>
+  <div class="cta">
+    <button class="cta-btn cta-btn-round" type="button" id="createBookBtn">
+      <span class="cta-btn-icon">📚</span>
+      <span class="cta-btn-text">単語本の作成</span>
+    </button>
+    <button class="cta-btn cta-btn-round cta-btn-primary" type="button" id="todayStudyBtn">
+      <span class="cta-btn-icon">✨</span>
+      <span class="cta-btn-text">今日の学習</span>
+    </button>
+    <button class="cta-btn cta-btn-round" type="button" id="settingsBtn">
+      <span class="cta-btn-icon">⚙️</span>
+      <span class="cta-btn-text">設定</span>
+    </button>
+  </div>
+
+  <div class="books" id="booksList">
+    <!-- 単語本は JavaScript で動的に追加されます -->
+  </div>
+
+    <!-- 情報追加モーダル（初級用） -->
+    <div id="infoPlusModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>情報を追加</h2>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <!-- 単語を追加ボタン -->
+      <div style="padding: 15px 20px; border-bottom: 1px solid #ddd; background-color: #f9f9f9;">
+        <button id="addWordFromModalBtn" class="btn" style="width: 100%; padding: 12px; background: #4caf50; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">単語を追加</button>
+      </div>
+
+      <!-- ステップ1: 単語選択 -->
+      <div id="step1-word-select" class="modal-step">
+        <h3>ステップ1: 単語を選択</h3>
+        <p class="step-description">直近の学習評価が4の単語のみ選択できます</p>
+            
+        <!-- 難易度フィルタ -->
+        <div class="difficulty-filter" style="margin-bottom: 15px;">
+          <label style="font-weight: bold; margin-right: 10px;">難易度:</label>
+          <button class="difficulty-btn active" data-difficulty="1">初級</button>
+          <button class="difficulty-btn" data-difficulty="2">中級</button>
+          <button class="difficulty-btn" data-difficulty="3">上級</button>
+          <button class="difficulty-btn" data-difficulty="4">完成</button>
+          <button class="difficulty-btn" data-difficulty="all">全て</button>
+        </div>
+            
+        <div id="wordList" class="word-list"></div>
+      </div>
+
+      <!-- ステップ2: 情報種類選択 -->
+      <div id="step2-info-select" class="modal-step hidden">
+        <h3>ステップ2: 追加する情報を選択</h3>
+        <p class="step-description" id="selectedWordLabel"></p>
+        <div class="info-type-buttons">
+          <button class="info-type-btn" data-type="sub-meaning">
+            <span class="btn-number">①</span>
+            <span class="btn-text">サブの意味＋対義語</span>
+            <span class="btn-status">未完了</span>
+          </button>
+          <button class="info-type-btn" data-type="derivative">
+            <span class="btn-number">②</span>
+            <span class="btn-text">派生語</span>
+            <span class="btn-status">未完了</span>
+          </button>
+          <button class="info-type-btn" data-type="synonym">
+            <span class="btn-number">③</span>
+            <span class="btn-text">類義語</span>
+            <span class="btn-status">未完了</span>
+          </button>
+          <button class="info-type-btn" data-type="example">
+            <span class="btn-number">④</span>
+            <span class="btn-text">例文</span>
+            <span class="btn-status">未完了</span>
+          </button>
+          <button class="info-type-btn" data-type="chunk-example">
+            <span class="btn-number">⑤</span>
+            <span class="btn-text">チャンク例文</span>
+            <span class="btn-status">未完了</span>
+          </button>
+          <button class="info-type-btn" data-type="phrase-example">
+            <span class="btn-number">⑥</span>
+            <span class="btn-text">よく使う表現の例文</span>
+            <span class="btn-status">未完了</span>
+          </button>
+          <button class="info-type-btn" data-type="translation">
+            <span class="btn-number">⑦</span>
+            <span class="btn-text">英訳</span>
+            <span class="btn-status">未完了</span>
+          </button>
+        </div>
+        <div class="modal-buttons" style="justify-content: center; margin-top: 20px;">
+          <button type="button" class="modal-btn cancel-btn" id="backToStep1">一つ前に戻る</button>
+        </div>
+      </div>
+
+      <!-- ステップ3: 情報入力 -->
+      <div id="step3-info-input" class="modal-step hidden">
+        <h3 id="inputTitle">情報入力</h3>
+        <div id="inputForm"></div>
+        <div class="form-buttons">
+          <button id="completeBtn" class="btn btn-primary">完了して次へ</button>
+          <button id="backBtn" class="btn btn-secondary">戻る</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
+  <div class="back-link" style="text-align: center; margin-top: 32px;">
+    <a href="../home_t.html" style="color: #1976d2; text-decoration: none; font-weight: 600;">← ホーム</a>
+  </div>
+
+  <!-- 単語本作成モーダル -->
+  <div id="createBookModal" class="modal">
+    <div class="modal-content">
+      <h2>新しい単語本を作成</h2>
+      <form id="createBookForm">
+        <div class="form-group">
+          <label for="bookName">単語本の名前</label>
+          <input type="text" id="bookName" required placeholder="例: 英単語 中級編">
+        </div>
+        <div class="modal-buttons">
+          <button type="submit" class="modal-btn confirm-btn">作成</button>
+          <button type="button" class="modal-btn cancel-btn" id="cancelCreateBook">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 単語本名前変更モーダル -->
+  <div id="renameBookModal" class="modal">
+    <div class="modal-content">
+      <h2>単語本の名前を変更</h2>
+      <form id="renameBookForm">
+        <div class="form-group">
+          <label for="newBookName">新しい名前</label>
+          <input type="text" id="newBookName" required placeholder="新しい単語本の名前">
+        </div>
+        <div class="modal-buttons">
+          <button type="submit" class="modal-btn confirm-btn">変更</button>
+          <button type="button" class="modal-btn cancel-btn" id="cancelRenameBook">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 単語追加方法選択モーダル -->
+  <div id="addMethodModal" class="modal">
+    <div class="modal-content">
+      <h2>単語を追加する方法を選択</h2>
+      <div class="add-method-options">
+        <button id="addMethodNormal" class="method-btn">
+          <div class="method-title">単語を手動で追加</div>
+          <div class="method-description">フォームから1つずつ単語を入力します</div>
+        </button>
+        <button id="addMethodCSV" class="method-btn">
+          <div class="method-title">CSVファイルから一括追加</div>
+          <div class="method-description">CSVファイルから複数の単語を一括で入力します</div>
+        </button>
+      </div>
+      <div class="modal-buttons" style="justify-content: center; gap: 1rem;">
+        <button type="button" class="modal-btn cancel-btn" id="cancelAddMethod">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV入力モーダル -->
+  <div id="csvImportModal" class="modal">
+    <div class="modal-content">
+      <h2>CSVファイルから一括追加</h2>
+      <p style="margin-bottom: 1.5rem; color: #666; font-size: 14px;">
+        エクスポートしたCSVファイルと同じ形式のファイルを選択してください
+      </p>
+      
+      <div style="border: 2px dashed #ddd; border-radius: 8px; padding: 30px; text-align: center; background: #fafafa; margin-bottom: 1.5rem;">
+        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+        <button type="button" id="selectCsvFileBtn" class="btn" style="padding: 12px 24px; background: #4caf50; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+          📁 ファイルを選択
+        </button>
+        <p id="selectedFileName" style="margin-top: 15px; color: #666; font-size: 14px; min-height: 20px;"></p>
+      </div>
+      
+      <div class="modal-buttons">
+        <button type="button" class="modal-btn cancel-btn" id="cancelCsvImport">キャンセル</button>
+        <button type="button" class="modal-btn confirm-btn" id="confirmCsvImport" disabled>インポート開始</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 単語本削除確認モーダル -->
+  <div id="deleteBookModal" class="modal">
+    <div class="modal-content">
+      <h2>単語本を削除しますか？</h2>
+      <p id="deleteBookMessage" style="margin-bottom: 1.5rem; color: #2a2a2a;"></p>
+      <div class="modal-buttons">
+        <button type="button" class="modal-btn cancel-btn" id="cancelDeleteBook">キャンセル</button>
+        <button type="button" class="modal-btn confirm-btn" id="confirmDeleteBook">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学習方法選択モーダル -->
+  <div id="studyMethodModal" class="modal">
+    <div class="modal-content">
+      <h2>学習方法を選択</h2>
+      <div class="add-method-options">
+        <button id="studyMethodToday" class="method-btn method-btn-primary">
+          <div class="method-title">今日の学習</div>
+          <div class="method-description">復習日が今日の単語を学習します</div>
+        </button>
+        <button id="studyMethodDifficulty" class="method-btn">
+          <div class="method-title">難易度別学習</div>
+          <div class="method-description">難易度ごとに学習します</div>
+        </button>
+        <button id="studyMethodRandom" class="method-btn">
+          <div class="method-title">ランダム学習</div>
+          <div class="method-description">ランダムな順番で学習します</div>
+        </button>
+        <button id="studyMethodMixed" class="method-btn">
+          <div class="method-title">カスタマイズ学習</div>
+          <div class="method-description">すべての単語をまとめて学習します</div>
+        </button>
+      </div>
+      <div class="modal-buttons" style="justify-content: center; gap: 1rem;">
+        <button type="button" class="modal-btn cancel-btn" id="cancelStudyMethod">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 難易度選択モーダル -->
+  <div id="difficultySelectModal" class="modal">
+    <div class="modal-content">
+      <h2>難易度を選択</h2>
+      <div class="add-method-options">
+        <button id="difficultyBasic" class="method-btn">
+          <div class="method-title">初級</div>
+        </button>
+        <button id="difficultyIntermediate" class="method-btn">
+          <div class="method-title">中級</div>
+        </button>
+        <button id="difficultyAdvanced" class="method-btn">
+          <div class="method-title">上級</div>
+        </button>
+        <button id="difficultyMastery" class="method-btn">
+          <div class="method-title">完成</div>
+        </button>
+      </div>
+      <div class="modal-buttons" style="justify-content: center; gap: 1rem;">
+        <button type="button" class="modal-btn cancel-btn" id="cancelDifficultySelect">戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- カスタマイズ学習モーダル -->
+  <div id="customStudyModal" class="modal">
+    <div class="modal-content custom-study-modal-content">
+      <h2>カスタマイズ学習</h2>
+      
+      <div class="custom-study-options">
+        <!-- 初級セクション -->
+        <div class="custom-study-section">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="customBasic">
+            <span>初級（基本の意味）</span>
+          </label>
+        </div>
+
+        <div class="custom-study-divider"></div>
+
+        <!-- 中級セクション -->
+        <div class="custom-study-section custom-study-group">
+          <div class="custom-study-parent">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customIntermediate">
+              <span>中級</span>
+            </label>
+          </div>
+          <div class="custom-study-children">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customSubMeanings" data-parent="customIntermediate">
+              <span>サブの意味+対義語</span>
+            </label>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customDerivedWords" data-parent="customIntermediate">
+              <span>派生語</span>
+            </label>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customSynonyms" data-parent="customIntermediate">
+              <span>類義語</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="custom-study-divider"></div>
+
+        <!-- 上級セクション -->
+        <div class="custom-study-section custom-study-group">
+          <div class="custom-study-parent">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customAdvanced">
+              <span>上級</span>
+            </label>
+          </div>
+          <div class="custom-study-children">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customExamples" data-parent="customAdvanced">
+              <span>例文</span>
+            </label>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customChunks" data-parent="customAdvanced">
+              <span>チャンク</span>
+            </label>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="customPhrases" data-parent="customAdvanced">
+              <span>よく使う表現</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="custom-study-divider"></div>
+
+        <!-- 完成セクション -->
+        <div class="custom-study-section">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="customCompletion">
+            <span>完成（英訳）</span>
+          </label>
+        </div>
+
+        <div class="custom-study-divider"></div>
+
+        <!-- 評価セクション -->
+        <div class="custom-study-section custom-study-evaluation">
+          <span class="evaluation-label">評価</span>
+          <label class="custom-radio">
+            <input type="radio" name="customEvaluation" value="yes" id="customEvalYes">
+            <span>あり</span>
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="customEvaluation" value="no" id="customEvalNo" checked>
+            <span>なし</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="modal-btn confirm-btn" id="startCustomStudy">学習</button>
+        <button type="button" class="modal-btn cancel-btn" id="cancelCustomStudy">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 復習日設定モーダル -->
+  <!-- 個別単語本設定モーダル -->
+  <div id="bookSettingsModal" class="modal">
+    <div class="modal-content settings-modal">
+      <div class="modal-header">
+        <h2 id="bookSettingsTitle">単語本の設定</h2>
+        <button type="button" class="modal-close" id="closeBookSettings">&times;</button>
+      </div>
+      
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button type="button" class="tab-btn active" data-tab="book-review-settings">復習日</button>
+        <button type="button" class="tab-btn" data-tab="book-wordbook-settings">単語本</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- 復習日タブ -->
+        <div class="tab-panel active" id="book-review-settings-panel">
+          <h3>復習日設定</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">この単語本の復習日を個別に設定できます。</p>
+          
+          <div class="review-settings-formula">
+            <p class="formula-label">計算式</p>
+            <p class="formula-text">復習日 = base × growth<sup>上達度</sup></p>
+            <p class="formula-note">※ 上達度 = 過去3回の評価平均</p>
+          </div>
+
+          <div class="review-settings-inputs">
+            <div class="setting-row">
+              <label for="bookReviewBase">base（基準日数）</label>
+              <input type="number" id="bookReviewBase" step="0.1" min="0.1" value="0.5">
+            </div>
+            <div class="setting-row">
+              <label for="bookReviewGrowth">growth（成長率）</label>
+              <input type="number" id="bookReviewGrowth" step="0.1" min="1" value="2.0">
+            </div>
+          </div>
+
+          <div class="review-settings-simulation">
+            <p class="simulation-label">シミュレーション</p>
+            <table class="simulation-table">
+              <thead>
+                <tr>
+                  <th>上達度</th>
+                  <th>1</th>
+                  <th>2</th>
+                  <th>3</th>
+                  <th>4</th>
+                </tr>
+              </thead>
+              <tbody id="bookSimulationBody">
+                <!-- JavaScriptで生成 -->
+              </tbody>
+            </table>
+          </div>
+
+          <button type="button" class="modal-btn confirm-btn" id="saveBookReviewSettings" style="margin-top: 1rem; width: 100%;">
+            復習日設定を保存
+          </button>
+        </div>
+
+        <!-- 単語本タブ -->
+        <div class="tab-panel" id="book-wordbook-settings-panel">
+          <h3>単語本設定</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">この単語本の設定を変更できます。</p>
+          
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">単語本の名前</label>
+            <p class="setting-description">単語本の名前を変更します</p>
+            <input type="text" id="bookNameInput" style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem;">
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">最大単語数</label>
+            <p class="setting-description">この単語本に格納できる最大単語数</p>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="bookMaxSizeInput" min="10" step="10" value="50" style="width: 100px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+              <span>語</span>
+            </div>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">難易度</label>
+            <p class="setting-description">現在: <strong id="currentBookLevel">初級</strong></p>
+            <p style="font-size: 0.875rem; color: #666; margin-bottom: 0.75rem;">新しい難易度を選択してください：</p>
+            <select id="bookLevelSelect" style="width: 100%; padding: 0.75rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px;">
+              <option value="初級">初級</option>
+              <option value="中級">中級</option>
+              <option value="上級">上級</option>
+              <option value="完成">完成</option>
+            </select>
+            <p style="margin-top: 0.5rem; color: #d32f2f; font-size: 0.875rem;">※ この操作により、単語本の進捗計算が変わります</p>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">情報追加時の評価値変更</label>
+            <p class="setting-description">単語に情報を追加して完了した際に、評価値（復習進捗）をどのように変更するか</p>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="radio" name="bookEvaluationChangeMode" value="global" checked>
+                <span>全体の設定のまま</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="radio" name="bookEvaluationChangeMode" value="none">
+                <span>変更しない</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="radio" name="bookEvaluationChangeMode" value="change">
+                <span>変更する</span>
+                <span style="margin-left: 1rem;">減算値:</span>
+                <input type="number" id="bookEvaluationChangeValue" min="0" max="4" step="0.1" value="1.0" style="width: 80px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+                <span style="font-size: 0.875rem; color: #666;">(0.0～4.0)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">情報追加判定</label>
+            <p class="setting-description">過去2回の評価値の平均がこの値以上の単語のみ、情報を追加できる</p>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span>閾値:</span>
+              <input type="number" id="bookInfoPlusThreshold" min="0" max="4" step="0.1" value="3.5" style="width: 100px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+              <span style="font-size: 0.875rem; color: #666;">(0.0～4.0、例: 3.5)</span>
+            </div>
+          </div>
+
+          <button type="button" class="modal-btn confirm-btn" id="saveBookSettings" style="margin-top: 1rem; width: 100%;">
+            設定を保存
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content settings-modal">
+      <div class="modal-header">
+        <h2>設定</h2>
+        <button type="button" class="modal-close" id="closeSettings">&times;</button>
+      </div>
+      
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button type="button" class="tab-btn active" data-tab="review-settings">復習日</button>
+        <button type="button" class="tab-btn" data-tab="wordbook-settings">単語本</button>
+        <button type="button" class="tab-btn" data-tab="study-control-settings">学習制御</button>
+        <button type="button" class="tab-btn" data-tab="print-settings">印刷</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Review Settings Tab -->
+        <div class="tab-panel active" id="review-settings-panel">
+          <h3>新しい単語本のデフォルト復習日設定</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">新しく作成する単語本に適用されるデフォルトの復習日設定です。各単語本で個別に変更できます。</p>
+          
+          <div class="review-settings-formula">
+            <p class="formula-label">計算式</p>
+            <p class="formula-text">復習日 = base × growth<sup>上達度</sup></p>
+            <p class="formula-note">※ 上達度 = 過去3回の評価平均</p>
+          </div>
+
+          <div class="review-settings-inputs">
+            <div class="setting-row">
+              <label for="defaultReviewBase">base（基準日数）</label>
+              <input type="number" id="defaultReviewBase" step="0.1" min="0.1" value="0.5">
+            </div>
+            <div class="setting-row">
+              <label for="defaultReviewGrowth">growth（成長率）</label>
+              <input type="number" id="defaultReviewGrowth" step="0.1" min="1" value="2.0">
+            </div>
+          </div>
+
+          <div class="review-settings-simulation">
+            <p class="simulation-label">シミュレーション</p>
+            <table class="simulation-table">
+              <thead>
+                <tr>
+                  <th>上達度</th>
+                  <th>1</th>
+                  <th>2</th>
+                  <th>3</th>
+                  <th>4</th>
+                </tr>
+              </thead>
+              <tbody id="defaultSimulationBody">
+                <!-- JavaScriptで生成 -->
+              </tbody>
+            </table>
+          </div>
+
+          <button type="button" class="modal-btn confirm-btn" id="saveDefaultReviewSettings" style="margin-top: 1rem; width: 100%;">
+            デフォルト設定を保存
+          </button>
+        </div>
+
+        <!-- Wordbook Settings Tab -->
+        <div class="tab-panel" id="wordbook-settings-panel">
+          <h3>単語本設定</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">新しく作成する単語本のデフォルト設定です。</p>
+          
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">大きさ</label>
+            <p class="setting-description">単語本に格納できる単語数のデフォルト値</p>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="defaultBookMaxSize" min="10" step="10" value="50" style="width: 100px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+              <span>語</span>
+            </div>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">初期難易度</label>
+            <p class="setting-description">新しく作成する単語本のデフォルト難易度</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="radio" name="defaultBookLevel" value="初級" checked>
+                <span>初級</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="radio" name="defaultBookLevel" value="中級">
+                <span>中級</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="radio" name="defaultBookLevel" value="上級">
+                <span>上級</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="radio" name="defaultBookLevel" value="完成">
+                <span>完成</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="button" class="modal-btn confirm-btn" id="saveWordbookSettings" style="margin-top: 1rem; width: 100%;">
+            設定を保存
+          </button>
+        </div>
+
+        <!-- Study Control Settings Tab -->
+        <div class="tab-panel" id="study-control-settings-panel">
+          <h3>学習制御設定</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">学習の開始条件や難易度上昇の条件を設定します。</p>
+          
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">学習スタートする単語の割合</label>
+            <p class="setting-description">単語本の最大単語数に対して、この割合以上の単語が追加されていれば学習可能になります</p>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="studyStartPercentage" min="0" max="100" step="5" value="20" style="width: 100px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">難易度を上げるときの単語本の進捗度</label>
+            <p class="setting-description">この進捗度を超えるとUPボタンが表示されます</p>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="levelUpProgressThreshold" min="0" max="100" step="5" value="60" style="width: 100px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">情報追加時の評価値変更</label>
+            <p class="setting-description">単語に情報を追加した際、その単語の評価値をどのように変更するかのデフォルト設定です</p>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="radio" name="defaultEvaluationChangeMode" value="none" checked>
+                <span>変更しない</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="radio" name="defaultEvaluationChangeMode" value="change">
+                <span>変更する</span>
+                <span style="margin-left: 1rem;">減算値:</span>
+                <input type="number" id="defaultEvaluationChangeValue" min="0" max="4" step="0.1" value="1.0" style="width: 80px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+                <span style="font-size: 0.875rem; color: #666;">(0.0～4.0)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="wordbook-setting-section">
+            <label class="setting-section-label">情報追加判定のデフォルト閾値</label>
+            <p class="setting-description">単語本を作成する際の、情報追加判定閾値のデフォルト値です（過去2回の評価平均）</p>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span>閾値:</span>
+              <input type="number" id="defaultInfoPlusThreshold" min="0" max="4" step="0.1" value="3.5" style="width: 100px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; text-align: center;">
+              <span style="font-size: 0.875rem; color: #666;">(0.0～4.0、例: 3.5)</span>
+            </div>
+          </div>
+
+          <button type="button" class="modal-btn confirm-btn" id="saveStudyControlSettings" style="margin-top: 1rem; width: 100%;">
+            設定を保存
+          </button>
+        </div>
+
+        <!-- Print Settings Tab -->
+        <div class="tab-panel" id="print-settings-panel">
+          <h3>印刷設定</h3>
+          <p>印刷に関する設定をここに配置します。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="export.js"></script>
+  <script src="import.js"></script>
+  <script src="index.js"></script>
+  <script src="初級/select.js"></script>
+</body>
+</html>

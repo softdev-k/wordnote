@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アプリケーション</title>
+  <link rel="stylesheet" href="static/style.css">
+  <style>
+    .app-menu-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      gap: 2rem;
+    }
+
+    .app-menu-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .app-menu-header h1 {
+      font-size: 3rem;
+      margin: 0;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .app-menu-header p {
+      font-size: 1.1rem;
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+    }
+
+    .app-menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 400px;
+      padding: 0 2rem;
+    }
+
+    .app-menu-btn {
+      display: block;
+      padding: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .app-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .app-menu-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-menu-container">
+    
+    <header class="app-menu-header">
+      <h1>アプリケーション</h1>
+      <p>ご利用になるアプリケーションを選択してください</p>
+    </header>
+
+    <main class="app-menu-buttons">
+      <a class="app-menu-btn" href="wordbook/home.html">単語帳</a>
+      <a class="app-menu-btn" href="wordnote/index.html">単語本</a>
+    </main>
+
+  </div>
+
+</body>
+
+</html>

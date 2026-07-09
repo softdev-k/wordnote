@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>単語帳 - フォルダ選択（確認）</title>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="top-header">
+      <a class="back-link" href="#" id="backLink">← 戻る</a>
+      <h1>フォルダを選択</h1>
+    </header>
+
+    <div class="folder-controls">
+      <div class="folder-controls-left">
+        <button class="control-btn create-btn" id="btnReview">復習</button>
+        <button class="control-btn delete-btn" id="btnShowSchedule">復習日表示</button>
+        <button class="control-btn" id="btnExportCsv">csvに出力</button>
+        <button class="control-btn" id="btnImportCsv">csvからの入力</button>
+      </div>
+      <div id="folderCount" class="count-display">...</div>
+    </div>
+
+    <div class="folder-list" id="folderList">
+      <!-- フォルダは JavaScript で動的に追加されます -->
+    </div>
+  </div>
+
+  <!-- Calendar Modal -->
+  <div class="modal" id="calendarModal">
+    <div class="modal-content calendar-modal-content">
+      <h2>復習日を選択</h2>
+      <div id="calendar" class="calendar"></div>
+      <div class="modal-buttons">
+        <button class="modal-btn confirm-btn" id="confirmCalendar">確定</button>
+        <button class="modal-btn cancel-btn" id="cancelCalendar">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV Import Modal -->
+  <div class="modal" id="csvImportModal">
+    <div class="modal-content" style="max-width:600px;">
+      <h2>CSVからの作成</h2>
+      <p style="margin-bottom:0.75rem;color:#555;">CSVファイルを選択してください。</p>
+      <input type="file" id="csvImportFile" accept=".csv,text/csv" style="width:100%;padding:0.6rem;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.95rem;" />
+      <div class="modal-buttons" style="margin-top:1rem;">
+        <button class="modal-btn cancel-btn" id="btnCsvCancel">キャンセル</button>
+        <button class="modal-btn confirm-btn" id="btnCsvCreate">作成</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/csv-export.js"></script>
+  <script src="static/csv-import.js"></script>
+  <script src="static/folders-check.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+// SQLite datasource for local development
+datasource db {
+	provider = "sqlite"
+	url      = "file:./dev.db"
+}
+
+generator client {
+	provider = "prisma-client-js"
+}
+
+model Folder {
+	id              Int              @id @default(autoincrement())
+	name            String
+	createdAt       DateTime         @default(now())
+	cards           Card[]
+	reviewSchedules ReviewSchedule[]
+}
+
+model Card {
+	id       Int     @id @default(autoincrement())
+	front    String
+	back     String
+	folderId Int?
+	folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+}
+
+model ReviewSchedule {
+	id           Int      @id @default(autoincrement())
+	folderId     Int
+	reviewDate   DateTime
+	reviewCount  Int      @default(0)
+	createdAt    DateTime @default(now())
+	folder       Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+}
+
+model WordnoteBook {
+	id               Int            @id @default(autoincrement())
+	name             String
+	level            String
+	maxSize          Int            @default(50)    // 最大単語数
+	reviewBase       Float          @default(0.5)   // 復習日計算の基準日数
+	reviewGrowth     Float          @default(2.0)   // 復習日計算の成長率
+	evaluationChange String?                        // 情報追加時の評価値変更設定
+	infoPlusThreshold Float?        @default(3.5)   // 情報追加判定の閾値（過去2回の平均）
+	cards            WordnoteCard[]
+	createdAt        DateTime       @default(now())
+}
+
+model WordnoteCard {
+	id           Int          @id @default(autoincrement())
+	partOfSpeech String
+	word         String
+	pronunciation String?
+	meanings     String // JSON array stored as string
+	imageUrl     String?
+	memo         String?
+	studyHistory String?      // JSON array: [{date: ISO string, rating: 1-4}]
+	difficulty   Int          @default(1) // 単語の難易度（1-4）- 単語本の難易度とは独立
+	currentLevel String       @default("初級") // 現在の学習段階（初級 → 中級 → 上級 → 完成）
+	// 追加フィールド（完成到達までに埋める領域）
+	subMeanings  String?      // JSON array of strings: サブの意味
+	antonyms     String?      // JSON array of strings: 対義語
+	synonyms     String?      // JSON array of strings: 類義語
+	derivedWords String?      // JSON array of strings: 派生語
+	exampleSentences String?  // JSON array of {meaning: string, example: string}: 意味に対応した例文
+	chunkExamples   String?   // JSON array of strings: チャンク例文
+	commonExpressions String? // JSON array of strings: よく使う表現の例文
+	translation  String?      // 英訳（テキスト）
+	infoPlusProgress Int       @default(0) // 情報追加の進捗（0-7）
+	reviewDate   String?      // 復習日（YYYY-MM-DD形式）
+	bookId       Int
+	book         WordnoteBook @relation(fields: [bookId], references: [id], onDelete: Cascade)
+	createdAt    DateTime     @default(now())
+}
